@@ -20,6 +20,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * @Author : tangmf
+ * @Desription :课程信息访问类 
+ * @Date : 2019年4月28日 下午2:57:03
+ */
 @RestController
 @RequestMapping("course")
 public class CourseController {
@@ -33,6 +38,7 @@ public class CourseController {
 		@ApiImplicitParam(name = "startTime", value = "开始时间",  dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "endTime", value = "结束时间",  dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "gradeId", value = "课程id",  dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "teaopenId", value = "对应教师openid",  dataType = "String", paramType = "query"),
 	})
 	@RequestMapping(value="/getAll",method=RequestMethod.GET)
 	public ResponseEntity<MessageBean<Course>> getAll(
@@ -40,10 +46,11 @@ public class CourseController {
 			@RequestParam(defaultValue = "", value = "week", required = false) String week,
 			@RequestParam(defaultValue = "", value = "startTime", required = false) String startTime,
 			@RequestParam(defaultValue = "", value = "endTime", required = false) String endTime,
-			@RequestParam(defaultValue = "", value = "gradeId", required = false) Integer gradeId
+			@RequestParam(defaultValue = "", value = "gradeId", required = false) Integer gradeId,
+			@RequestParam(defaultValue = "", value = "teaopenId", required = false) String teaopenId
 			) {
 		try {
-			MessageBean<Course> response = courseService.findAll(name,week,startTime,endTime,gradeId);
+			MessageBean<Course> response = courseService.findAll(name, week, startTime, endTime, gradeId, teaopenId);
 			return new ResponseEntity<MessageBean<Course>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -107,7 +114,7 @@ public class CourseController {
 			@ApiImplicitParam(name="course",value="课程实体类",required=true,dataType="Course",paramType="body"),
 			@ApiImplicitParam(name="courseId",value="课程id",required=true,dataType="int",paramType="query")
 	})
-	@RequestMapping(value="/update",method=RequestMethod.POST)
+	@RequestMapping(value="/update",method=RequestMethod.PUT)
 	public ResponseEntity<MessageBean<Course>> update(@RequestBody Course course,@RequestParam("courseId") Integer courseId
 			) {
 		try {
@@ -119,4 +126,18 @@ public class CourseController {
 			return new ResponseEntity<MessageBean<Course>>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	} 
+	
+	@ApiOperation("查询全部课程名称信息")
+	@RequestMapping(value="/getName",method=RequestMethod.GET)
+	public ResponseEntity<MessageBean<Course>> getName(
+			) {
+		try {
+			MessageBean<Course> response = courseService.findName();
+			return new ResponseEntity<MessageBean<Course>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return new ResponseEntity<MessageBean<Course>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

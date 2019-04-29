@@ -14,7 +14,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.gxy.tmf.signin.model.Course;
+import com.gxy.tmf.signin.model.Teacher;
 import com.gxy.tmf.signin.repository.CourseRepository;
+import com.gxy.tmf.signin.repository.TeacherRepository;
 import com.gxy.tmf.signin.service.CourseService;
 import com.gxy.tmf.signin.util.MessageBean;
 import com.gxy.tmf.signin.util.TimeUtils;
@@ -30,10 +32,12 @@ public class CourseServiceImpl implements CourseService{
 	
 	@Autowired
 	private CourseRepository courseRepository;
+	@Autowired
+	private TeacherRepository teacherRepository;
 	@Override
-	public MessageBean<Course> findAll(String name, String week, String startTime, String endTime, Integer gradeId) {
+	public MessageBean<Course> findAll(String name,String week,String startTime,String endTime,Integer gradeId,String teaopenId) {
 		// TODO Auto-generated method stub
-		Specification<Course> spec = this.getCourseSpec(name, week,startTime,endTime,gradeId);
+		Specification<Course> spec = this.getCourseSpec(name, week,startTime,endTime,gradeId,teaopenId);
 		List<Course> courseList = courseRepository.findAll(spec);
 		return new MessageBean<Course>("200","课程信息查询成功",courseList);
 	}
@@ -41,8 +45,10 @@ public class CourseServiceImpl implements CourseService{
 	@Override
 	public MessageBean<Course> save(Course course) {
 		// TODO Auto-generated method stub
-		if (Util.isNotEmpty(course.getName())) {
+		Teacher teacher_db = teacherRepository.findByOpenId(course.getTeacherobj().getOpenid());
+		if (Util.isNotEmpty(course.getName())&& Util.isNotEmpty(teacher_db)) {
 			course.setCreateDate(new Date());
+			course.setTeacherobj(teacher_db);
 			course = courseRepository.saveAndFlush(course);
 			return new MessageBean<Course>("200", "插入课程信息成功", course);
 		} else {
@@ -90,6 +96,9 @@ public class CourseServiceImpl implements CourseService{
 			if(Util.isNotEmpty(course.getGradeobj())) {
 				course_db.setGradeobj(course.getGradeobj());
 			}
+			if(Util.isNotEmpty(course.getTeacherobj())) {
+				course_db.setTeacherobj(course.getTeacherobj());
+			}
 			course_db = courseRepository.saveAndFlush(course_db);
 			return new  MessageBean<Course>("200","更新课程信息成功",course_db);
 		}else {
@@ -104,9 +113,10 @@ public class CourseServiceImpl implements CourseService{
 	 * @param startTime 开始时间
 	 * @param endTime	结束时间	
 	 * @param gradeId	班级id
+	 * @param teaopenId 对应教师openId
 	 * @return
 	 */
-	public Specification<Course> getCourseSpec(String name, String week, String startTime, String endTime, Integer gradeId) {
+	public Specification<Course> getCourseSpec(String name, String week, String startTime, String endTime, Integer gradeId, String teaopenId) {
 		return (Root<Course> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 			List<Predicate> predicates = new ArrayList<Predicate>();
 			// 未被删除的
@@ -115,7 +125,7 @@ public class CourseServiceImpl implements CourseService{
 				predicates.add(cb.like(root.get("name").as(String.class), "%"+name+"%"));
 			}
 			if (Util.isNotEmpty(week)) {// 星期
-				predicates.add(cb.equal(root.get("week").as(Integer.class), "%"+week+"%"));
+				predicates.add(cb.like(root.get("week").as(String.class), "%"+week+"%"));
 			}
 			if (Util.isNotEmpty(startTime)) { // 开始时间
 				predicates.add(cb.greaterThanOrEqualTo(root.get("startTime").as(Date.class),  TimeUtils.parseDate("yyyy-MM-dd", startTime)));
@@ -126,11 +136,21 @@ public class CourseServiceImpl implements CourseService{
 			if (Util.isNotEmpty(gradeId)) {//班级id
 				predicates.add(cb.equal(root.get("gradeobj").get("id").as(Integer.class), gradeId));
 			}
+			if (Util.isNotEmpty(teaopenId)) {//对应教师openId
+				predicates.add(cb.equal(root.get("teacherobj").get("openid").as(String.class), teaopenId));
+			}
 			// 添加排序功能 降序 根据id降序
 			query.orderBy(cb.asc(root.get("id").as(Integer.class)));
 			query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
 			return query.getRestriction();
 		};
+	}
+
+	@Override
+	public MessageBean<Course> findName() {
+		// TODO Auto-generated method stub
+		List<Course> courseList = courseRepository.findName();
+		return new MessageBean<Course>("200","课程名称信息查询成功",courseList);
 	}
 
 }

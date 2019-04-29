@@ -1,5 +1,7 @@
 package com.gxy.tmf.signin.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +16,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="role_info")
-public class Role extends BaseEntity{
+public class Role extends BaseEntity implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * 唯一标识 主键 角色id
 	 */

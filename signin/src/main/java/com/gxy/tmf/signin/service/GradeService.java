@@ -5,23 +5,22 @@ import com.gxy.tmf.signin.util.MessageBean;
 
 public interface GradeService {
 	/**
-	 *  查询全部班级信息 
+	 * 查询全部班级信息
 	 * @param name 班级名称
-	 * @param count 班级人数
-	 * @param teacherName 班级老师姓名
-	 * @param countNow 班级当前人数
+	 * @param counttotal 班级总人数
+	 * @param countnow 班级当前人数
+	 * @param teaopenId 对应教师openId
 	 * @return
 	 */
-	MessageBean<Grade> findAll(String name,Integer count,String teacherName, Integer countNow);
+	MessageBean<Grade> findAll(String name,Integer counttotal,Integer countnow, String teaopenId);
 	
 	
 	/**
 	 * 班级信息保存
 	 * @param grade 班级信息实体类
-	 * @param openid 用户openid
 	 * @return
 	 */
-	MessageBean<Grade> save(Grade grade,String openId);
+	MessageBean<Grade> save(Grade grade);
 	
 	/**
 	 * 班级信息删除

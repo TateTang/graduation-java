@@ -1,5 +1,6 @@
 package com.gxy.tmf.signin.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -21,7 +22,12 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "course_info")
-public class Course extends BaseEntity{
+public class Course extends BaseEntity implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * 唯一标识 主键
 	 */
@@ -62,6 +68,13 @@ public class Course extends BaseEntity{
 	@JoinColumn(name = "grade_id")
 	@ManyToOne
 	private Grade gradeobj;
+	
+	/**
+	 * 添加课程的老师 一个老师可以添加多个课程
+	 */
+	@ManyToOne
+	@JoinColumn(name = "teacher_openid",referencedColumnName="teacher_openid")
+	private Teacher teacherobj;
 	
 	/**
 	 * 删除标志
@@ -117,6 +130,14 @@ public class Course extends BaseEntity{
 		this.gradeobj = gradeobj;
 	}
 
+	public Teacher getTeacherobj() {
+		return teacherobj;
+	}
+
+	public void setTeacherobj(Teacher teacherobj) {
+		this.teacherobj = teacherobj;
+	}
+
 	public boolean isDeleteflag() {
 		return deleteflag;
 	}
@@ -125,5 +146,10 @@ public class Course extends BaseEntity{
 		this.deleteflag = deleteflag;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Course [id=" + id + ", name=" + name + ", week=" + week + ", startTime=" + startTime + ", endTime="
+				+ endTime + ", gradeobj=" + gradeobj + ", teacherobj=" + teacherobj + ", deleteflag=" + deleteflag
+				+ "]";
+	}
 }

@@ -5,18 +5,17 @@ import com.gxy.tmf.signin.model.Course;
 import com.gxy.tmf.signin.util.MessageBean;
 
 public interface CourseService {
-	
 	/**
 	 * 查询全部课程信息
-	 * @param name 课程名称
+	 * @param name 课程名
 	 * @param week 星期
 	 * @param startTime 开始时间
-	 * @param endTime	结束时间
-	 * @param gradeId	班级名称
+	 * @param endTime 结束时间
+	 * @param gradeId 对应的班级id
+	 * @param teaopenId 对应的教师的openId
 	 * @return
 	 */
-	MessageBean<Course> findAll(String name,String week,String startTime,String endTime,Integer gradeId);
-	
+	MessageBean<Course> findAll(String name,String week,String startTime,String endTime,Integer gradeId,String teaopenId);
 	
 	/**
 	 * 课程信息保存
@@ -46,4 +45,10 @@ public interface CourseService {
 	 * @return
 	 */
 	MessageBean<Course> update(Course course,Integer courseId);
+	
+	/**
+	 * 查询课程的名称
+	 * @return
+	 */
+	MessageBean<Course> findName();
 }

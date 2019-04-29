@@ -23,4 +23,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer>{
 	 */
 	@Query("select c from Course c where c.id = ?1")
 	Course findByCourseId(Integer courseId);
+	
+	/**
+	 * 查询课程信息
+	 * @return
+	 */
+	@Query("select c from Course c where c.deleteflag = false")
+	List<Course> findName();
 }

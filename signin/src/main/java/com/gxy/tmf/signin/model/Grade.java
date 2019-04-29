@@ -1,10 +1,14 @@
 package com.gxy.tmf.signin.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -15,7 +19,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "grade_info")
-public class Grade extends BaseEntity{
+public class Grade extends BaseEntity implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 唯一标识 主键
 	 */
@@ -33,60 +41,81 @@ public class Grade extends BaseEntity{
 	/**
 	 * 班级人数
 	 */
-	@Column(name="grade_count",nullable=true,length=32)
-	private Integer count;
-	
-	/**
-	 * 班级的老师姓名
-	 */
-	@Column(name="grade_teachername",length = 32)
-	private String teacherName;
+	@Column(name="grade_counttotal",nullable=true,length=32)
+	private Integer counttotal;
 	
 	/**
 	 * 班级当前人数
 	 */
-	@Column(name="grade_countNow",length = 32)
-	private Integer countNow;
+	@Column(name="grade_countnow",length = 32)
+	private Integer countnow;
+	
+	/**
+	 * 教师openId 
+	 * 属性referencedColumnName标注的是所关联表中的字段名，若不指定则使用的所关联表的主键字段名作为外键。
+	 * 一个老师可以创建多个班级
+	 */
+	@ManyToOne
+	@JoinColumn(name = "teacher_openid",referencedColumnName="teacher_openid")
+	private Teacher teacherobj; 
+	
 	/**
 	 * 删除标志
 	 */
 	@Column(name = "grade_deleteflag", length = 4,columnDefinition="bool default false")
 	private boolean deleteflag;
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Integer getCount() {
-		return count;
+
+	public Integer getCounttotal() {
+		return counttotal;
 	}
-	public void setCount(Integer count) {
-		this.count = count;
+
+	public void setCounttotal(Integer counttotal) {
+		this.counttotal = counttotal;
 	}
-	public String getTeacherName() {
-		return teacherName;
+
+	public Integer getCountnow() {
+		return countnow;
 	}
-	public void setTeacherName(String teacherName) {
-		this.teacherName = teacherName;
+
+	public void setCountnow(Integer countnow) {
+		this.countnow = countnow;
 	}
-	public Integer getCountNow() {
-		return countNow;
+
+	public Teacher getTeacherobj() {
+		return teacherobj;
 	}
-	public void setCountNow(Integer countNow) {
-		this.countNow = countNow;
+
+	public void setTeacherobj(Teacher teacherobj) {
+		this.teacherobj = teacherobj;
 	}
+
 	public boolean isDeleteflag() {
 		return deleteflag;
 	}
+
 	public void setDeleteflag(boolean deleteflag) {
 		this.deleteflag = deleteflag;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Grade [id=" + id + ", name=" + name + ", counttotal=" + counttotal + ", countnow=" + countnow
+				+ ", teacherobj=" + teacherobj + ", deleteflag=" + deleteflag + "]";
+	}
 }

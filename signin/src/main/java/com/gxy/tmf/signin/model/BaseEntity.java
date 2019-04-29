@@ -1,5 +1,6 @@
 package com.gxy.tmf.signin.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -11,7 +12,11 @@ import javax.persistence.MappedSuperclass;
  * @Data: 2019年3月20日 下午12:00:38
  */
 @MappedSuperclass
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 创建时间
 	 */

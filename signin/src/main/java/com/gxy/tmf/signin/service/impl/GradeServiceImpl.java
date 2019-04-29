@@ -14,8 +14,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.gxy.tmf.signin.model.Grade;
+import com.gxy.tmf.signin.model.Teacher;
 import com.gxy.tmf.signin.repository.GradeRepository;
-import com.gxy.tmf.signin.repository.UserRepository;
+import com.gxy.tmf.signin.repository.TeacherRepository;
 import com.gxy.tmf.signin.service.GradeService;
 import com.gxy.tmf.signin.util.MessageBean;
 import com.gxy.tmf.signin.util.Util;
@@ -32,28 +33,28 @@ public class GradeServiceImpl implements GradeService {
 	@Autowired
 	private GradeRepository gradeRepository;
 	@Autowired
-	private UserRepository userRepository;
-	
+	private TeacherRepository teacherRepository;
 	
 	@Override
-	public MessageBean<Grade> findAll(String name, Integer count, String teacherName, Integer countNow) {
+	public MessageBean<Grade> findAll(String name,Integer counttotal,Integer countnow, String teaopenId) {
 		// TODO Auto-generated method stub
-		Specification<Grade> spec = this.getGradeSpec(name, count, teacherName, countNow);
+		Specification<Grade> spec = this.getGradeSpec(name, counttotal, countnow, teaopenId);
 		List<Grade> gradeList = gradeRepository.findAll(spec);
 		return new MessageBean<Grade>("200","班级信息查询成功",gradeList);
 	}
 
 	@Override
-	public MessageBean<Grade> save(Grade grade,String openId) {
+	public MessageBean<Grade> save(Grade grade) {
 		// TODO Auto-generated method stub
-		if (Util.isNotEmpty(grade.getName())) {
+		Teacher teacher_db = teacherRepository.findByOpenId(grade.getTeacherobj().getOpenid());
+		if (Util.isNotEmpty(grade) && Util.isNotEmpty(teacher_db)) {//这里主要需要进行转换
 			grade.setCreateDate(new Date());
-			grade.setCountNow(0);
-			grade.setTeacherName(userRepository.findByOpenId(openId).getName());
+			grade.setCountnow(0);
+			grade.setTeacherobj(teacher_db);
 			grade = gradeRepository.saveAndFlush(grade);
 			return new MessageBean<Grade>("200", "插入班级信息成功", grade);
 		} else {
-			return new MessageBean<Grade>("error", "插入用户信息失败");
+			return new MessageBean<Grade>("error", "插入班级信息失败");
 		}
 	}
 	
@@ -69,13 +70,16 @@ public class GradeServiceImpl implements GradeService {
 			return new MessageBean<Void>("200", "删除班级信息成功");
 		}
 	}
+
 	/**
 	 * 条件查询构造器 动态查询班级信息
-	 * @param name  班级名称
-	 * @param count 班级编号
+	 * @param name 班级名称
+	 * @param counttotal 班级总人数
+	 * @param countnow 班级当前人数
+	 * @param teaopenId 对应教师openId
 	 * @return
 	 */
-	public Specification<Grade> getGradeSpec(String name, Integer count,String teacherName,Integer countNow) {
+	public Specification<Grade> getGradeSpec(String name,Integer counttotal,Integer countnow, String teaopenId) {
 		return (Root<Grade> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 			List<Predicate> predicates = new ArrayList<Predicate>();
 			// 未被删除的
@@ -83,14 +87,14 @@ public class GradeServiceImpl implements GradeService {
 			if (Util.isNotEmpty(name)) {//班级名称
 				predicates.add(cb.like(root.get("name").as(String.class), "%"+name+"%"));
 			}
-			if (Util.isNotEmpty(count)) {//班级人数
-				predicates.add(cb.equal(root.get("count").as(Integer.class), count));
+			if (Util.isNotEmpty(counttotal)) {//总人数
+				predicates.add(cb.equal(root.get("counttotal").as(Integer.class), counttotal));
 			}
-			if (Util.isNotEmpty(teacherName)) {// 小程序openId
-				predicates.add(cb.equal(root.get("teacherName").as(String.class),"%"+teacherName+"%"));
+			if (Util.isNotEmpty(countnow)) {//班级当前人数
+				predicates.add(cb.equal(root.get("countnow").as(Integer.class), countnow));
 			}
-			if (Util.isNotEmpty(countNow)) {//班级人数
-				predicates.add(cb.equal(root.get("countNow").as(Integer.class), countNow));
+			if (Util.isNotEmpty(teaopenId)) {// 小程序openId
+				predicates.add(cb.equal(root.get("teacherobj").get("openid").as(String.class),teaopenId));
 			}
 			//添加排序功能，根据id排序 升序
 			query.orderBy(cb.asc(root.get("id").as(Integer.class)));
@@ -114,8 +118,11 @@ public class GradeServiceImpl implements GradeService {
 			if(Util.isNotEmpty(grade.getName())) {
 				grade_db.setName(grade.getName());
 			}
-			if(Util.isNotEmpty(grade.getCount())) {
-				grade_db.setCount(grade.getCount());
+			if(Util.isNotEmpty(grade.getCounttotal())) {
+				grade_db.setCounttotal(grade.getCounttotal());
+			}
+			if(Util.isNotEmpty(grade.getCountnow())) {
+				grade_db.setCountnow(grade.getCountnow());
 			}
 			grade_db = gradeRepository.saveAndFlush(grade_db);
 			return new  MessageBean<Grade>("200","更新班级信息成功",grade_db);

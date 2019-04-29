@@ -28,17 +28,19 @@ public class GradeController {
 	@ApiOperation("不带分页查询全部班级信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "name", value = "班级名称",  dataType = "String", paramType = "query"),
-		@ApiImplicitParam(name = "count", value = "班级人数",  dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "counttotal", value = "班级总人数",  dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "countnow", value = "班级当前人数",  dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "teaopenId", value = "创建班级的老师openId",  dataType = "String", paramType = "query"),
 	})
 	@RequestMapping(value="/getAll",method=RequestMethod.GET)
 	public ResponseEntity<MessageBean<Grade>> getAll(
 			@RequestParam(defaultValue = "", value = "name", required = false) String name,
-			@RequestParam(defaultValue = "", value = "count", required = false) Integer count,
-			@RequestParam(defaultValue = "", value = "teacherName", required = false) String teacherName,
-			@RequestParam(defaultValue = "", value = "countNow", required = false) Integer countNow
+			@RequestParam(defaultValue = "", value = "counttotal", required = false) Integer counttotal,
+			@RequestParam(defaultValue = "", value = "countnow", required = false) Integer countnow,
+			@RequestParam(defaultValue = "", value = "teaopenId", required = false) String teaopenId
 			) {
 		try {
-			MessageBean<Grade> response = gradeService.findAll(name,count,teacherName,countNow);
+			MessageBean<Grade> response = gradeService.findAll( name, counttotal, countnow,  teaopenId);
 			return new ResponseEntity<MessageBean<Grade>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -48,18 +50,14 @@ public class GradeController {
 	}
 	
 	@ApiOperation(value = "利用实体添加班级信息")
-	
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "grade", value = "班级实体类", required = true, dataType = "Grade", paramType = "body"),
-		@ApiImplicitParam(name = "openId",value="用户openid",required=true,dataType="String",paramType="query")
-})
+	@ApiImplicitParam(name = "grade", value = "班级实体类", required = true, dataType = "Grade", paramType = "body")
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public ResponseEntity<MessageBean<Grade>> create(@RequestBody Grade grade,@RequestParam("openId")String openId) {
+	public ResponseEntity<MessageBean<Grade>> create(@RequestBody Grade grade) {
 		try {
 			if (Util.isEmpty(grade)) {
 				return new ResponseEntity<MessageBean<Grade>>(new MessageBean<Grade>("error", "未获取到班级信息"), HttpStatus.OK);
 			}
-			MessageBean<Grade> response = gradeService.save(grade,openId);
+			MessageBean<Grade> response = gradeService.save(grade);
 			return new ResponseEntity<MessageBean<Grade>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -106,7 +104,7 @@ public class GradeController {
 			@ApiImplicitParam(name="grade",value="班级实体类",required=true,dataType="Grade",paramType="body"),
 			@ApiImplicitParam(name="gradeId",value="班级id",required=true,dataType="int",paramType="query")
 	})
-	@RequestMapping(value="/update",method=RequestMethod.POST)
+	@RequestMapping(value="/update",method=RequestMethod.PUT)
 	public ResponseEntity<MessageBean<Grade>> update(@RequestBody Grade grade,@RequestParam("gradeId") Integer gradeId
 			) {
 		try {

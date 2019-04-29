@@ -1,10 +1,14 @@
 package com.gxy.tmf.signin.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -15,7 +19,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="wxlogin_info")
-public class WxLogin extends BaseEntity{
+public class WxLogin extends BaseEntity implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * 唯一标识 主键 用户id
 	 */
@@ -35,6 +44,14 @@ public class WxLogin extends BaseEntity{
 	 */
 	@Column(name="login_session_key",nullable = true, length = 32)
 	private String session_key;
+	
+	/**
+	 * 登录角色编号
+	 * 与role表一一对应
+	 */
+	@JoinColumn(name = "role_id")
+	@OneToOne
+	private Role roleobj;
 
 	public Integer getId() {
 		return id;
@@ -59,5 +76,20 @@ public class WxLogin extends BaseEntity{
 	public void setSession_key(String session_key) {
 		this.session_key = session_key;
 	}
+
+	public Role getRoleobj() {
+		return roleobj;
+	}
+
+	public void setRoleobj(Role roleobj) {
+		this.roleobj = roleobj;
+	}
+
+	@Override
+	public String toString() {
+		return "WxLogin [id=" + id + ", openid=" + openid + ", session_key=" + session_key + ", roleobj=" + roleobj
+				+ "]";
+	}
+
 	
 }

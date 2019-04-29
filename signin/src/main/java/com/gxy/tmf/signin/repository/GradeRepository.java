@@ -24,6 +24,10 @@ public interface GradeRepository extends JpaRepository<Grade, Integer>{
 	@Query("select g from Grade g where g.id = ?1")
 	Grade findByGradeId(Integer gradeId);
 	
+	/**
+	 * 查询所有班级的名称
+	 * @return
+	 */
 	@Query("select g from Grade g where g.deleteflag = false")
 	List<Grade> findName();
 }
