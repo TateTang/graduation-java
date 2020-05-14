@@ -98,7 +98,7 @@ public class TeacherServiceImpl implements TeacherService {
 	public MessageBean<Teacher> update(Teacher teacher, String openId) {
 		// TODO Auto-generated method stub
 		Teacher teacher_db = teacherRepository.findByOpenId(openId);
-		if(Util.isNotEmpty(teacher_db)) {
+		if(Util.isNotEmpty(teacher_db)) {//不存在 点击保存需要保存信息
 			if(Util.isNotEmpty(teacher.getAccount())) {
 				teacher_db.setAccount(teacher.getAccount());
 			}
@@ -108,7 +108,8 @@ public class TeacherServiceImpl implements TeacherService {
 			teacher_db = teacherRepository.saveAndFlush(teacher_db);
 			return new  MessageBean<Teacher>("200","更新教师信息成功",teacher_db);
 		}else {
-			return new  MessageBean<Teacher>("error","未找到需要修改的教师信息",teacher_db);
+			save(teacher);//保存信息
+			return new  MessageBean<Teacher>("200","保存教师信息成功",teacher_db);
 		}
 	}	
 }

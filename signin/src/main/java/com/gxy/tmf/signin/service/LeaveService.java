@@ -15,7 +15,7 @@ public interface LeaveService {
 	 * @return
 	 */
 	MessageBean<Leave> findAll(String leaveTime,String leaveContent,Integer courseId, 
-			Integer status,String stuopneId,  String teaopenId);
+			Integer status, Integer status2, String stuopneId,  String teaopenId);
 	
 	
 	/**
@@ -46,4 +46,12 @@ public interface LeaveService {
 	 * @return
 	 */
 	MessageBean<Leave> update(Leave Leave,Integer leaveId);
+	
+	/**
+	 * 根据leaveID更新请假状态
+	 * @param leaveId 离开id
+	 * @param status 请假状态 
+	 * @return
+	 */
+	MessageBean<Leave> updateStatus(Integer leaveId, Integer status);
 }

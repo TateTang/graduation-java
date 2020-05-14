@@ -30,4 +30,25 @@ public interface CourseRepository extends JpaRepository<Course, Integer>{
 	 */
 	@Query("select c from Course c where c.deleteflag = false")
 	List<Course> findName();
+	
+	/**
+	 * 根据学生openid查询该学生未签到的课程
+	 * @param stuopenId
+	 * @return
+	 */
+	@Query(value="select * from course_info"  
+			+" where course_id not in  ("  
+			+" select course_id"  
+			+" from arrive_info"  
+			+" where student_openid = ?1)"
+			+" and grade_id=?2",nativeQuery=true)
+	List<Course> findNoQianDaoCourse(String stuopenId,Integer gradeId);
+	
+	/**
+	 * 根据课程id和验证码查询课程西信息
+	 * @param courseId
+	 * @param yzm
+	 * @return
+	 */
+	Course findByIdAndYzm(Integer courseId,String yzm);
 }

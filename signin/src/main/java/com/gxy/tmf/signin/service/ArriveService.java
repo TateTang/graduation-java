@@ -1,5 +1,7 @@
 package com.gxy.tmf.signin.service;
 
+import java.util.List;
+
 import com.gxy.tmf.signin.model.Arrive;
 import com.gxy.tmf.signin.util.MessageBean;
 
@@ -42,4 +44,12 @@ public interface ArriveService {
 	 * @return
 	 */
 	MessageBean<Arrive> update(Arrive arrive,Integer arriveId);
+	
+	/**
+	 * 查询签到信息 根据学生openid和课程id
+	 * @param stuopenId
+	 * @param ids
+	 * @return
+	 */
+	MessageBean<Arrive> findByStuopenIdAndCourse(String stuopenId,List<Integer> courseIds);
 }

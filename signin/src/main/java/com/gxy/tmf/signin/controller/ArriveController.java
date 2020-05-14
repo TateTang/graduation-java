@@ -1,5 +1,7 @@
 package com.gxy.tmf.signin.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +64,19 @@ public class ArriveController {
 				return new ResponseEntity<MessageBean<Arrive>>(new MessageBean<Arrive>("error", "未获取到签到信息"), HttpStatus.OK);
 			}
 			MessageBean<Arrive> response = arriveService.save(arrive);
+			return new ResponseEntity<MessageBean<Arrive>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return new ResponseEntity<MessageBean<Arrive>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@ApiOperation(value="查询全部签到信息根据stuopenid和courseIds")
+	@RequestMapping(value="/getAllByStuopenId",method=RequestMethod.GET)
+	public ResponseEntity<MessageBean<Arrive>> getAllByStuopenId(@RequestParam("stuopenId")String stuopenId,@RequestParam("courseIds")List<Integer> courseIds){
+		try {
+			MessageBean<Arrive> response = arriveService.findByStuopenIdAndCourse(stuopenId, courseIds);
 			return new ResponseEntity<MessageBean<Arrive>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception

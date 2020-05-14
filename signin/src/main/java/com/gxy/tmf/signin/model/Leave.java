@@ -46,7 +46,7 @@ public class Leave extends BaseEntity implements Serializable{
 	/**
 	 * 请假内容
 	 */
-	@Column(name="leave_content",length = 64)
+	@Column(name="leave_content")
 	private String leavecontent;
 	
 	/**
@@ -71,11 +71,16 @@ public class Leave extends BaseEntity implements Serializable{
 	private Teacher teacherobj;
 
 	/**
-	 * 请假状态  0 已提交 1 已审批 
+	 * 请假状态  0 已提交 1 通过  2不通过
 	 */
 	@Column(name="leave_status",columnDefinition = "int default 0")
 	private Integer status;
-
+	
+	/**
+	 * 请假单驳回原因
+	 */
+	@Column(name="leave_rejectreason")
+	private String rejectreason;
 	public Integer getId() {
 		return id;
 	}
@@ -131,10 +136,21 @@ public class Leave extends BaseEntity implements Serializable{
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
+	
+	public String getRejectreason() {
+		return rejectreason;
+	}
+
+	public void setRejectreason(String rejectreason) {
+		this.rejectreason = rejectreason;
+	}
 
 	@Override
 	public String toString() {
 		return "Leave [id=" + id + ", leavetime=" + leavetime + ", leavecontent=" + leavecontent + ", courseobj="
-				+ courseobj + ", studentobj=" + studentobj + ", teacherobj=" + teacherobj + ", status=" + status + "]";
+				+ courseobj + ", studentobj=" + studentobj + ", teacherobj=" + teacherobj + ", status=" + status
+				+ ", rejectreason=" + rejectreason + "]";
 	}
+
+	
 }

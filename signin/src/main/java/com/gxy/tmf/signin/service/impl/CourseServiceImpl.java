@@ -35,9 +35,9 @@ public class CourseServiceImpl implements CourseService{
 	@Autowired
 	private TeacherRepository teacherRepository;
 	@Override
-	public MessageBean<Course> findAll(String name,String week,String startTime,String endTime,Integer gradeId,String teaopenId) {
+	public MessageBean<Course> findAll(String name,String yzm,String startTime,String endTime,Integer gradeId,String teaopenId) {
 		// TODO Auto-generated method stub
-		Specification<Course> spec = this.getCourseSpec(name, week,startTime,endTime,gradeId,teaopenId);
+		Specification<Course> spec = this.getCourseSpec(name, yzm,startTime,endTime,gradeId,teaopenId);
 		List<Course> courseList = courseRepository.findAll(spec);
 		return new MessageBean<Course>("200","课程信息查询成功",courseList);
 	}
@@ -79,13 +79,14 @@ public class CourseServiceImpl implements CourseService{
 	@Override
 	public MessageBean<Course> update(Course course, Integer courseId) {
 		// TODO Auto-generated method stub
+		Teacher teacher_db = teacherRepository.findByOpenId(course.getTeacherobj().getOpenid());
 		Course course_db = courseRepository.findByCourseId(courseId);
-		if(Util.isNotEmpty(course_db)) {
+		if(Util.isNotEmpty(course_db) ) {
 			if(Util.isNotEmpty(course.getName())) {
 				course_db.setName(course.getName());
 			}
-			if(Util.isNotEmpty(course.getWeek())) {
-				course_db.setWeek(course.getWeek());
+			if(Util.isNotEmpty(course.getYzm())) {
+				course_db.setWeek(course.getYzm());
 			}
 			if(Util.isNotEmpty(course.getStartTime())) {
 				course_db.setStartTime(course.getStartTime());
@@ -96,8 +97,8 @@ public class CourseServiceImpl implements CourseService{
 			if(Util.isNotEmpty(course.getGradeobj())) {
 				course_db.setGradeobj(course.getGradeobj());
 			}
-			if(Util.isNotEmpty(course.getTeacherobj())) {
-				course_db.setTeacherobj(course.getTeacherobj());
+			if(Util.isNotEmpty(teacher_db)) {
+				course_db.setTeacherobj(teacher_db);
 			}
 			course_db = courseRepository.saveAndFlush(course_db);
 			return new  MessageBean<Course>("200","更新课程信息成功",course_db);
@@ -109,14 +110,14 @@ public class CourseServiceImpl implements CourseService{
 	/**
 	 * 条件查询构造器
 	 * @param name 课程名称
-	 * @param week 星期
+	 * @param yzm 签到码
 	 * @param startTime 开始时间
 	 * @param endTime	结束时间	
 	 * @param gradeId	班级id
 	 * @param teaopenId 对应教师openId
 	 * @return
 	 */
-	public Specification<Course> getCourseSpec(String name, String week, String startTime, String endTime, Integer gradeId, String teaopenId) {
+	public Specification<Course> getCourseSpec(String name, String yzm, String startTime, String endTime, Integer gradeId, String teaopenId) {
 		return (Root<Course> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 			List<Predicate> predicates = new ArrayList<Predicate>();
 			// 未被删除的
@@ -124,8 +125,8 @@ public class CourseServiceImpl implements CourseService{
 			if (Util.isNotEmpty(name)) {// 课程名称
 				predicates.add(cb.like(root.get("name").as(String.class), "%"+name+"%"));
 			}
-			if (Util.isNotEmpty(week)) {// 星期
-				predicates.add(cb.like(root.get("week").as(String.class), "%"+week+"%"));
+			if (Util.isNotEmpty(yzm)) {// 签到码
+				predicates.add(cb.like(root.get("yzm").as(String.class), "%"+yzm+"%"));
 			}
 			if (Util.isNotEmpty(startTime)) { // 开始时间
 				predicates.add(cb.greaterThanOrEqualTo(root.get("startTime").as(Date.class),  TimeUtils.parseDate("yyyy-MM-dd", startTime)));
@@ -152,5 +153,19 @@ public class CourseServiceImpl implements CourseService{
 		List<Course> courseList = courseRepository.findName();
 		return new MessageBean<Course>("200","课程名称信息查询成功",courseList);
 	}
+
+	@Override
+	public MessageBean<Course> findNoQianDaoCourse(String stuopenId,Integer gradeId) {
+		// TODO Auto-generated method stub
+		List<Course> courseList = courseRepository.findNoQianDaoCourse(stuopenId,gradeId);
+		return new MessageBean<Course>("200","未签到课程信息查询成功",courseList);
+	}
+
+	@Override
+	public MessageBean<Course> findByIdAndYzm(Integer courseId, String yzm) {
+		// TODO Auto-generated method stub
+		Course course = courseRepository.findByIdAndYzm(courseId, yzm);
+		return new MessageBean<Course>("200","查询课程信息成功",course);
+	} 
 
 }

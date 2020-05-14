@@ -41,9 +41,9 @@ public class LeaveServiceImpl implements LeaveService {
 	
 	@Override
 	public MessageBean<Leave> findAll(String leaveTime,String leaveContent,Integer courseId, 
-			Integer status, String stuopneId, String teaopenId) {
+			Integer status, Integer status2,String stuopneId, String teaopenId) {
 		// TODO Auto-generated method stub
-		Specification<Leave> spec = this.getLeaveSpec(leaveTime, leaveContent, courseId, status, stuopneId, teaopenId);
+		Specification<Leave> spec = this.getLeaveSpec(leaveTime, leaveContent, courseId, status, status2, stuopneId, teaopenId);
 		List<Leave> leaveList = leaveRepository.findAll(spec);
 		return new MessageBean<Leave>("200", "请假信息查询成功", leaveList);
 	}
@@ -78,9 +78,21 @@ public class LeaveServiceImpl implements LeaveService {
 	}
 
 	@Override
-	public MessageBean<Leave> update(Leave Leave, Integer leaveId) {
+	public MessageBean<Leave> update(Leave leave, Integer leaveId) {
 		// TODO Auto-generated method stub
-		return null;
+		Leave leave_db = leaveRepository.findById(leaveId).get();
+		if(Util.isNotEmpty(leave_db)) {//修改请假的内容
+			if(Util.isNotEmpty(leave.getRejectreason())) {
+				leave_db.setRejectreason(leave.getRejectreason());
+			}
+			if(Util.isNotEmpty(leave.getStatus())) {
+				leave_db.setStatus(leave.getStatus());
+			}
+			leave_db = leaveRepository.saveAndFlush(leave_db);
+			return new  MessageBean<Leave>("200","更新请假信息成功",leave_db);
+		}else {
+			return new  MessageBean<Leave>("error","没有获取到请假信息成功",leave_db);
+		}
 	}
 	
 	/**
@@ -94,7 +106,7 @@ public class LeaveServiceImpl implements LeaveService {
 	 * @return
 	 */
 	public Specification<Leave> getLeaveSpec(String leaveTime,String leaveContent,Integer courseId, 
-			 Integer status,String stuopenId, String teaopenId) {
+			 Integer status,Integer status2,String stuopenId, String teaopenId) {
 		return (Root<Leave> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
 			List<Predicate> predicates = new ArrayList<Predicate>();
 			if(Util.isNotEmpty(leaveTime)) {//离开时间
@@ -107,7 +119,8 @@ public class LeaveServiceImpl implements LeaveService {
 				predicates.add(cb.equal(root.get("courseobj").get("id").as(Integer.class), courseId));
 			}
 			if (Util.isNotEmpty(status)) {// 请假状态
-				predicates.add(cb.equal(root.get("status").as(Integer.class), status));
+				predicates.add(cb.or(cb.equal(root.get("status").as(Integer.class), status),
+						cb.equal(root.get("status").as(Integer.class), status2)));
 			}
 			if (Util.isNotEmpty(stuopenId)) {// 请假人openId
 				predicates.add(cb.equal(root.get("studentobj").get("openid").as(String.class), stuopenId));
@@ -120,5 +133,20 @@ public class LeaveServiceImpl implements LeaveService {
 			query.where(cb.and(predicates.toArray(new Predicate[predicates.size()])));
 			return query.getRestriction();
 		};
+	}
+
+	@Override
+	public MessageBean<Leave> updateStatus(Integer leaveId, Integer status) {
+		// TODO Auto-generated method stub
+		Leave leave_db = leaveRepository.findById(leaveId).get();
+		if(Util.isNotEmpty(leave_db)) {
+			if(Util.isNotEmpty(status)) {
+				leave_db.setStatus(status);
+			}
+			leave_db = leaveRepository.saveAndFlush(leave_db);
+			return new  MessageBean<Leave>("200","更新请假信息成功",leave_db);
+		}else {
+			return new  MessageBean<Leave>("error","未找到需要修改的请假信息",leave_db);
+		}
 	}
 }

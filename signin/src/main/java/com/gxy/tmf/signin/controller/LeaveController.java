@@ -35,6 +35,7 @@ public class LeaveController {
 		@ApiImplicitParam(name = "leaveContent", value = "请假内容",  dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "courseId", value = "课程id",  dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "status", value = "请假状态",  dataType = "int", paramType = "query"),
+		@ApiImplicitParam(name = "status2", value = "请假状态2",  dataType = "int", paramType = "query"),
 		@ApiImplicitParam(name = "stuopenId", value = "请假人openId",  dataType = "String", paramType = "query"),
 		@ApiImplicitParam(name = "teaopenId", value = "请假老师对应id",  dataType = "String", paramType = "query"),
 	})
@@ -44,11 +45,12 @@ public class LeaveController {
 			@RequestParam(defaultValue = "", value = "leaveContent", required = false) String leaveContent,
 			@RequestParam(defaultValue = "", value = "courseId", required = false) Integer courseId,
 			@RequestParam(defaultValue = "", value = "status", required = false) Integer status,
+			@RequestParam(defaultValue = "", value = "status2", required = false) Integer status2,
 			@RequestParam(defaultValue = "", value = "stuopenId", required = false) String stuopenId,
 			@RequestParam(defaultValue = "", value = "teaopenId", required = false) String teaopenId
 			) {
 		try {
-			MessageBean<Leave> response = leaveService.findAll(leaveTime, leaveContent, courseId, status,stuopenId,  teaopenId);
+			MessageBean<Leave> response = leaveService.findAll(leaveTime, leaveContent, courseId, status, status2, stuopenId,  teaopenId);
 			return new ResponseEntity<MessageBean<Leave>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -66,6 +68,42 @@ public class LeaveController {
 				return new ResponseEntity<MessageBean<Leave>>(new MessageBean<Leave>("error", "未获取到请假信息"), HttpStatus.OK);
 			}
 			MessageBean<Leave> response = leaveService.save(leave);
+			return new ResponseEntity<MessageBean<Leave>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return new ResponseEntity<MessageBean<Leave>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@ApiOperation(value="根据请假id和请假状态，更新请假信息")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="leaveId",value="请假id",required=true,dataType="int",paramType="query"),
+			@ApiImplicitParam(name="status",value="请假状态",required=true,dataType="int",paramType="query")
+	})
+	@RequestMapping(value="/updateStatus",method=RequestMethod.PUT)
+	public ResponseEntity<MessageBean<Leave>> updateStatus(@RequestParam("leaveId")Integer leaveId,@RequestParam("status")Integer status
+			) {
+		try {
+			MessageBean<Leave> response = leaveService.updateStatus(leaveId, status);
+			return new ResponseEntity<MessageBean<Leave>>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return new ResponseEntity<MessageBean<Leave>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@ApiOperation(value="根据请假openid和请假实体类，更新请假信息")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name="leave",value="请假实体类",required=true,dataType="Leave",paramType="body"),
+			@ApiImplicitParam(name="leaveId",value="请假id",required=true,dataType="int",paramType="query")
+	})
+	@RequestMapping(value="/update",method=RequestMethod.PUT)
+	public ResponseEntity<MessageBean<Leave>> update(@RequestBody Leave leave,@RequestParam("leaveId") Integer leaveId
+			) {
+		try {
+			MessageBean<Leave> response = leaveService.update(leave, leaveId);
 			return new ResponseEntity<MessageBean<Leave>>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception

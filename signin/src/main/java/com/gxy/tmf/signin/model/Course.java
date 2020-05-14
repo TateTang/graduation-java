@@ -43,10 +43,10 @@ public class Course extends BaseEntity implements Serializable{
 	private String name;
 	
 	/**
-	 * 星期
+	 * 签到码
 	 */
-	@Column(name="course_week",nullable=true,length=4)
-	private String week;
+	@Column(name="course_yzm",nullable=true,length=32)
+	private String yzm;
 	
 	/**
 	 * 开始时间
@@ -98,12 +98,12 @@ public class Course extends BaseEntity implements Serializable{
 		this.name = name;
 	}
 
-	public String getWeek() {
-		return week;
+	public String getYzm() {
+		return yzm;
 	}
 
-	public void setWeek(String week) {
-		this.week = week;
+	public void setWeek(String yzm) {
+		this.yzm = yzm;
 	}
 
 	public Date getStartTime() {
@@ -148,7 +148,7 @@ public class Course extends BaseEntity implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Course [id=" + id + ", name=" + name + ", week=" + week + ", startTime=" + startTime + ", endTime="
+		return "Course [id=" + id + ", name=" + name + ", yzm=" + yzm + ", startTime=" + startTime + ", endTime="
 				+ endTime + ", gradeobj=" + gradeobj + ", teacherobj=" + teacherobj + ", deleteflag=" + deleteflag
 				+ "]";
 	}

@@ -44,9 +44,6 @@ public class StudentServiceImpl implements StudentService {
 		// TODO Auto-generated method stub
 		if(Util.isNotEmpty(student.getAccount())) {
 			student.setCreateDate(new Date());
-//			Role roleobj = new Role();
-//			roleobj.setId(2);
-//			student.setRoleobj(roleobj); //设置角色为学生
 			student = studentRepository.saveAndFlush(student);
 			return new  MessageBean<Student>("200","插入学生信息成功",student);
 		}else {
@@ -103,20 +100,21 @@ public class StudentServiceImpl implements StudentService {
 		// TODO Auto-generated method stub
 		Student student_db = studentRepository.findByOpenId(openId);
 //		Grade grade_db = gradeRepository.findByGradeId(student.getGradeobj().getId());
-		if(Util.isNotEmpty(student_db)) {
+		if(Util.isNotEmpty(student_db)) {//存在修改 不存在 就直接添加
 			if(Util.isNotEmpty(student.getAccount())) {
 				student_db.setAccount(student.getAccount());
 			}
 			if(Util.isNotEmpty(student.getName())) {
 				student_db.setName(student.getName());
 			}
-			if(Util.isNotEmpty(student.getGradeobj())) {
-				student_db.setGradeobj(student.getGradeobj());
-			}
+//			if(Util.isNotEmpty(student.getGradeobj())) {
+//				student_db.setGradeobj(student.getGradeobj());
+//			}
 			student_db = studentRepository.saveAndFlush(student_db);
 			return new  MessageBean<Student>("200","更新学生信息成功",student_db);
 		}else {
-			return new  MessageBean<Student>("error","未找到需要修改的学生信息",student_db);
+			save(student);//不存在 保存学生信息
+			return new  MessageBean<Student>("200","保存学生信息成功",student);
 		}
 	}	
 }
